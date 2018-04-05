@@ -1,12 +1,12 @@
-import ga.Overseer
+import ga.{Overseer, Population}
 import util.console
 
 object Auto extends App {
   var overseer = new Overseer()
 
-  selectAction()
+  selectAction
 
-  def selectAction(): Unit = {
+  def selectAction: Unit = {
     println(
       """
         |Select action
@@ -17,11 +17,12 @@ object Auto extends App {
     )
 
     console.getInteger(1 to 3) match {
+      case 1 => println(Population.generatePopulation(overseer.populationSize, 10))
       case 2 => overseer = overseer.setParameters
       case _ => System.exit(0)
     }
 
-    selectAction()
+    selectAction
   }
 
 }

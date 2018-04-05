@@ -10,11 +10,11 @@ import util.console
   * @param maxCrossoversPerGeneration
   * @param maxMutationsPerGeneration
   */
-case class Overseer (
+case class Overseer(
   step: Float = .1f,
   populationSize: Int = 300,
   maxCrossoversPerGeneration: Int = 150,
-  maxMutationsPerGeneration: Int = 100,
+  maxMutationsPerGeneration: Int = 100
 ) {
   def setParameters: Overseer = {
     println(toString)

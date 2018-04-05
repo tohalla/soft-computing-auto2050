@@ -1,1 +1,31 @@
 \section{Toteutus}
+
+\subsection{Tehokkuuden mittaus}
+Tehokkuutta mitataan tuotetun lämpöenergia ja käytettävän polttoaineen välisenä
+suhteena. Suurin mahdollinen arvo on 1, jolloin tapahtuu täydellinen palaminen.
+
+\begin{itemize}
+	\item Lämmönsiirron tehokkuus
+		\begin{itemize}
+			\item Kuinka hyvin polttoastia siirtää energiaa ympäristöön.
+			\item astian massa, kyky siirtää tai säilyttää lämpöä, lämpöhäviöt (hormi)
+		\end{itemize}
+	\item lämpöhäviöitä voi mitata järjestelmästä poistuvien pakokaasujen, jotka
+	sisältävät energiaa polttamattoman kaasun ja partikkelimaterian muodossa, perusteella.
+\end{itemize}
+
+\subsection{Työn ulkopuolelle rajatut tekijät}
+
+\subsection{Tekijöitä, joita optimoijan käyttäjä pystyy määrittelemään}
+\begin{tabular*}{\textwidth}{lcl}
+	\toprule
+	\bf Nimi & \bf Suure & \bf Kuvaus \\
+	\midrule
+	Paloaika & \(t\) & Kuinka pitkän aikaa palamista tarkastellaan? \\
+	Massa & \(m\) & Poltettavan puun massa \\
+	\bottomrule
+\end{tabular*}
+
+\subsection{Geneettinen algoritmi}
+Alkion genotyypin alleelit ovat liukulukuja väliltä \([0, 1]\).
+
