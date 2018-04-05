@@ -21,6 +21,6 @@ case class Population(
 
 object Population {
   def generatePopulation(size: Int, geneCount: Int) = new Population(
-    entities = Vector.fill(size)(Entity.generateEntity(geneCount))
+    entities = Vector.fill(size)(Genotype.generate(geneCount))
   )
 }

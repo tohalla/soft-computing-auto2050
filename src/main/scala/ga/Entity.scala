@@ -2,26 +2,27 @@ package ga
 
 import scala.util.Random
 
-case class Entity(
-  genes: Vector[Any]
-) {
+abstract class Entity {
+  val genes: Vector[Any]
   val size = genes.length
-
-  // genotyyppi -> fenotyyppi
-  def decode: Entity = copy(
-    genes = genes.map(gene => gene)
-  )
-
-  // fenotyyppi -> genotyyppi
-  def encode: Entity = copy(
-    genes = genes.map(gene => gene)
-  )
 
   override def toString: String = s"[${genes.mkString(",")}]"
 }
 
-object Entity {
-  def generateEntity(size: Int): Entity = new Entity(
+case class Genotype(genes: Vector[Float]) extends Entity {
+  def decode: Phenotype = new Phenotype(
+    genes = genes.map(gene => gene)
+  )
+}
+
+case class Phenotype(genes: Vector[Float]) extends Entity {
+  def encode: Phenotype = new Phenotype(
+    genes = genes.map(gene => gene)
+  )
+}
+
+object Genotype {
+  def generate(size: Int): Entity = new Genotype(
     genes = Vector.fill(size)(Random.nextFloat)
   )
 }
