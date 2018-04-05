@@ -16,7 +16,7 @@ object console {
 
   def getFloat(range: Range = null): Float = {
     val input = Try(StdIn.readFloat()).getOrElse(getFloat(range))
-    if (range == null || range.contains(input))
+    if (range == null || (range.start <= input && range.end >= input))
       input
     else {
       println(s"Valitse liukuluku väliltä ${range.start} - ${range.end}")

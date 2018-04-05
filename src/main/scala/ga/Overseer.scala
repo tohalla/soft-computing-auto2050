@@ -2,20 +2,21 @@ package ga
 
 import util.console
 
-/**
-  * Hallinnoi geneettisen algoritmin parametreja
-  *
-  * @param step
-  * @param populationSize
-  * @param maxCrossoversPerGeneration
-  * @param maxMutationsPerGeneration
-  */
+import scala.io.StdIn
+
+case class Constraint(value: Any, text: String, unit: String, limit: Range = null)
+
 case class Overseer(
   step: Float = .1f,
   populationSize: Int = 300,
   maxCrossoversPerGeneration: Int = 150,
   maxMutationsPerGeneration: Int = 100,
-  getFitness: ()
+  constraints: Vector[Constraint] = Vector(
+    new Constraint(0, "Time", "s"),
+    new Constraint(0f, "Wood fuel volume", "m^3"),
+    new Constraint(0f, "Furnace volume", "m^3"),
+    new Constraint(0f, "Water content", null, 0 to 1)
+  )
 ) {
   def setParameters: Overseer = {
     println(toString)
@@ -38,12 +39,49 @@ case class Overseer(
     }
   }
 
+  def setConstraints: Overseer = {
+    println(toString)
+    println(
+      s"""
+         |Select which parameter you'd like to adjust
+         |${
+        constraints.zipWithIndex.map(c =>
+          s"${c._2 + 1}. ${c._1.text}" +
+            s"${if (c._1.limit != null) s" (value between ${c._1.limit.start} and ${c._1.limit.end}}" else ""}"
+        ).mkString("\n")
+      }
+         |${constraints.length + 1}. I'm done
+      """.stripMargin
+    )
+    console.getInteger(1 to constraints.length + 1) match {
+      case x if x < constraints.length + 1 => copy(
+        constraints = constraints.updated(
+          x - 1,
+          constraints(x - 1).copy(
+            value = constraints(x - 1).value match {
+              case _: Int => console.getInteger()
+              case _: Float => console.getFloat()
+              case _ => StdIn.readLine
+            }
+          )
+        )
+      ).setConstraints
+      case _ => this
+    }
+  }
+
   override def toString: String =
     s"""
-       |Parameters:
+       |Parameters
        |\tStep: ${step}
        |\tPopulation size: ${populationSize}
        |\tMaximum crossovers per generation: ${maxCrossoversPerGeneration}
        |\tMaximum mutations per generation: ${maxMutationsPerGeneration}
+       |Constraints
+       |\t${
+      constraints
+        .map(c => s"${c.text}: ${if (c.value == 0) "Not set" else s"${c.value}${if (c.unit == null) "" else c.unit}"}")
+        .mkString("\n\t")
+    }
      """.stripMargin
 }

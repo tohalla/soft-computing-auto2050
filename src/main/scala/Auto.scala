@@ -11,14 +11,16 @@ object Auto extends App {
       """
         |Select action
         |1. Run genetic algorithm
-        |2. Set parameters
-        |3. Exit
+        |2. Set constraints
+        |3. Set parameters
+        |4. Exit
       """.stripMargin
     )
 
-    console.getInteger(1 to 3) match {
+    console.getInteger(1 to 4) match {
       case 1 => println(Population.generatePopulation(overseer.populationSize, 10))
-      case 2 => overseer = overseer.setParameters
+      case 2 => overseer = overseer.setConstraints
+      case 3 => overseer = overseer.setParameters
       case _ => System.exit(0)
     }
 

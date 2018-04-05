@@ -13,7 +13,7 @@ case class Population(
         entities.take(2).zipWithIndex.map { case (entity, i) =>
           s"(${i}): ${entity}"
         }.mkString(",\n\t") + s"\n\t...\n\t(${entities.length - 1}): ${entities.last}"
-      else entities.zipWithIndex.map{ case (entity, i) => s"(${i}): ${entity}" } mkString (",\n\t")
+      else entities.zipWithIndex.map { case (entity, i) => s"(${i}): ${entity}" } mkString (",\n\t")
     }
     """.stripMargin
 
