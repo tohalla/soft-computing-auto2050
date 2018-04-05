@@ -1,0 +1,72 @@
+\documentclass[12pt]{article}
+	\usepackage[margin=0.7in]{geometry}
+	\usepackage[subpreambles=true]{standalone}
+	\usepackage[finnish]{babel}
+	\usepackage{
+		booktabs,
+		bookmark,
+		array,
+		hyperref,
+		graphicx,
+		import,
+		float,
+		amsmath,
+		amssymb,
+		mathtools,
+		textcomp
+	}
+	\usepackage[utf8]{inputenc}
+
+\restylefloat{table}
+
+\renewcommand*{\tableautorefname}{Taulukko}
+
+\hypersetup{colorlinks, citecolor=black, filecolor=black, linkcolor=black, urlcolor=black}
+
+\title{\normalsize\uppercase{auto2050}\\\Huge Puun polton optimointi GA:n avulla}
+\author{Touko Hallasmaa}
+\date{}
+
+\selectlanguage{finnish}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\begin{abstract}
+Työn tavoitteena on selvittää puun polton tehokkuuteen vaikuttavat tekijät.
+Lopputuloksena on geneettisellä algoritmilla toimiva optimoija, joka optimoi
+puun polton tehokkuuteen vaikuttavia parametreja. Puunpolton tehokkuutta
+mitataan työssä syntyneen lämpöenergian perusteella.
+\end{abstract}
+
+\input{tekijat}
+\input{kemia}
+\input{ga}
+\input{suunnittelu}
+\input{toteutus}
+
+\begin{thebibliography}{9}
+	\bibitem{karelia}
+	Ojarinta, Petteri,
+	\textit{Wood as fuel and combustion technology},
+	\url{http://www.karelia.fi/bioenergia/nwh/course_materials/material/Burning_of_wood.pdf}
+
+	\bibitem{p}
+	\url{https://www.fpl.fs.fed.us/documnts/fplmisc/rpt2136.pdf}
+
+	\bibitem{hakkinen}
+	Häkkinen, Jari,
+	\textit{Puun pienpoltto --- palaminen ja teknologiat},
+	\url{http://jultika.oulu.fi/files/nbnfioulu-201704201520.pdf}
+
+	\bibitem{gov}
+	\url{https://nepis.epa.gov/Exe/ZyPDF.cgi/20008YOS.PDF?Dockey=20008YOS.PDF}
+
+	\bibitem{wiki_ga}
+	\url{https://en.wikipedia.org/wiki/Genetic_algorithm}
+
+\end{thebibliography}
+
+\end{document}

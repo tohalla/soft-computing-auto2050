@@ -1,0 +1,29 @@
+training-data/
+
+*.class
+*.log
+
+# sbt
+.cache/
+.history/
+.lib/
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# IDE
+.scala_dependencies
+.worksheet
+.idea
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

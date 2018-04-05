@@ -1,0 +1,22 @@
+\section{Geneettinen algoritmi}
+
+Geneettinen algoritmi (GA) on luonnolliseen valinnan inspiroima optimointitekniikka.
+Sen aikana käytetään \textit{periytymisen}, \textit{mutaatioiden} ja \textit{rekombinaatioiden}
+prosesseja.
+
+\begin{enumerate}
+	\item Luodaan populaatio, jonka alkioiden arvot asetetaan tässä työssä alussa satunnaisiksi
+	\item Populaatiosta luodaan uusi sukupolvi \textbf{(Tämä kohta ohitetaan ensimmäisellä iteraatiolla)}
+	\begin{enumerate}
+		\item Alkioihin voidaan tehdä satunnaisia mutaatioita
+		\item Tämän jälkeen niiden välillä saatetaan tehdään rekombinaatio, josta syntyy uusi alkio.
+		Alkio voi myös siirtyä muuttumattomana seuraavaan sukupolveen, jos esimerkiksi
+		populaatiossa tehtävää rekombinaatioiden määrää on rajattu.
+	\end{enumerate}
+	\item Genotyyppi~\(\rightarrow\)~fenotyyppi
+	\item	Kunkin fenotyypin perusteella lasketaan sille kelvollisuusarvo
+	\item Kelvollisuusarvon perusteella lasketaan genotyypin todennäköisyys selviytyä seuraavaan sukupolveen
+	\item Eliminoidaan alkioita edellisessä kohdassa laskettujen todennäköisyyksien avulla
+	\item Fenotyyppi~\(\rightarrow\)~genotyyppi
+	\item Palataan kohtaan 2. ellei keskeytykselle asetettu ehto toteudu.
+\end{enumerate}
