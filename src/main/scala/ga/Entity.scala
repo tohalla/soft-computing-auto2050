@@ -32,7 +32,7 @@ case class Phenotype(genes: Vector[Float]) extends Entity {
 }
 
 object Genotype {
-  def generate(size: Int): Entity = new Genotype(
+  def generate(size: Int): Genotype = new Genotype(
     genes = Vector.fill(size)(Random.nextFloat)
   )
 }

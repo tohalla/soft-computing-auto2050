@@ -4,22 +4,22 @@ import scala.io.StdIn
 import scala.util.Try
 
 object console {
-  def getInteger(range: Range = null): Int = {
-    val input = Try(StdIn.readInt()).getOrElse(getInteger(range))
+  def getInt(range: Range = null): Int = {
+    println("Syötä kokonaisluku" + (if (range == null) "" else s" väliltä ${range.start} - ${range.end}"))
+    val input = Try(StdIn.readInt()).getOrElse(getInt(range))
     if (range == null || range.contains(input))
-      input
+    input
     else {
-      println(s"Valitse kokonaisluku väliltä ${range.start} - ${range.end}")
-      getInteger(range)
+      getInt(range)
     }
   }
 
   def getFloat(range: Range = null): Float = {
+    println("Syötä liukuluku" + (if (range == null) "" else s" väliltä ${range.start} - ${range.end}"))
     val input = Try(StdIn.readFloat()).getOrElse(getFloat(range))
     if (range == null || (range.start <= input && range.end >= input))
       input
     else {
-      println(s"Valitse liukuluku väliltä ${range.start} - ${range.end}")
       getFloat(range)
     }
   }
