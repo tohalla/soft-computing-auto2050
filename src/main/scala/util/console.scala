@@ -4,23 +4,43 @@ import scala.io.StdIn
 import scala.util.Try
 
 object console {
-  def getInt(range: Range = null): Int = {
-    println("Syötä kokonaisluku" + (if (range == null) "" else s" väliltä ${range.start} - ${range.end}"))
-    val input = Try(StdIn.readInt()).getOrElse(getInt(range))
-    if (range == null || range.contains(input))
-    input
-    else {
-      getInt(range)
-    }
+  def getInt(minValue: Int, maxValue: Int): Int = getInt(Some(minValue), Some(maxValue))
+
+  def getInt(
+    minValue: Option[Int] = None,
+    maxValue: Option[Int] = None,
+    query: Option[String] = Some("Syötä kokonaisluku")
+  ): Int = {
+    if (query.isDefined)
+      print(query +
+        (if (minValue.isEmpty && maxValue.isEmpty) "" else s" (${minValue.getOrElse("")} - ${maxValue.getOrElse("")})")
+      )
+    val input = Try(StdIn.readInt()).getOrElse(getInt(minValue, maxValue))
+    if (
+      (minValue.isEmpty && maxValue.isEmpty) ||
+        (minValue.getOrElse(input) <= input && maxValue.getOrElse(input) >= input)
+    )
+      input
+    else getInt(minValue, maxValue)
   }
 
-  def getFloat(range: Range = null): Float = {
-    println("Syötä liukuluku" + (if (range == null) "" else s" väliltä ${range.start} - ${range.end}"))
-    val input = Try(StdIn.readFloat()).getOrElse(getFloat(range))
-    if (range == null || (range.start <= input && range.end >= input))
+  def getFloat(minValue: Float, maxValue: Float): Float = getFloat(Some(minValue), Some(maxValue))
+
+  def getFloat(
+    minValue: Option[Float] = None,
+    maxValue: Option[Float] = None,
+    query: Option[String] = Some("Syötä liukuluku")
+  ): Float = {
+    if (query.isDefined)
+      println(query +
+        (if (minValue.isEmpty && maxValue.isEmpty) "" else s" (${minValue.getOrElse("")} - ${maxValue.getOrElse("")})")
+      )
+    val input = Try(StdIn.readFloat()).getOrElse(getFloat(minValue, maxValue))
+    if (
+      (minValue.isEmpty && maxValue.isEmpty) ||
+        (minValue.getOrElse(input) <= input && maxValue.getOrElse(input) >= input)
+    )
       input
-    else {
-      getFloat(range)
-    }
+    else getFloat(minValue, maxValue)
   }
 }

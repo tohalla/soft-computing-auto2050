@@ -11,7 +11,7 @@ case class Population(genotypes: Vector[Genotype]) {
 
   override def toString: String =
     s"""
-       |Entities:
+       |Alkiot:
        |\t${
       if (size > 10)
         genotypes.take(2).zipWithIndex.map { case (genotype, i) =>

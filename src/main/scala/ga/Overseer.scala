@@ -1,78 +1,65 @@
 package ga
 
-import util.console
-import util.misc
+import util.{console, misc}
 
-import scala.io.StdIn
 import scala.util.Random
 
-case class Constraint(value: Any, text: String, unit: String, limit: Range = null)
-
 case class Overseer(
-  step: Float = .1f,
   populationSize: Int = 300,
   maxCrossoversPerGeneration: Int = 300,
   maxMutationsPerGeneration: Int = 100,
   mutationProbability: Float = .3f,
-  constraints: Vector[Constraint] = Vector(
-    new Constraint(0, "Time", "s"),
-    new Constraint(0f, "Wood fuel volume", "m^3"),
-    new Constraint(0f, "Furnace volume", "m^3"),
-    new Constraint(0f, "Water content", null, 0 to 1)
+  variables: Vector[Variable] = Vector(
+    new Variable("Time", "s", 0, 3600),
+    new Variable("Wood fuel volume", "m^3", 0, 1)
+    //    new Variable(0f, "Furnace volume", "m^3"),
+    //    new Variable(0f, "Water content", null, 0 to 1)
   )
 ) {
-  def getRandomPopulation: Population = Population.generatePopulation(populationSize, 10)
+  def getRandomPopulation: Population = Population.generatePopulation(populationSize, variables.length)
 
-  def setParameters: Overseer = {
+  def promptSetParameters: Overseer = {
     println(toString)
     println(
       """
-        |Select which parameter you'd like to adjust
-        |1. Step
-        |2. Population Size (adjusting population size will affect current population)
-        |3. Maximum crossovers per generation
-        |4. Maximum mutations per generation
-        |5. Mutation probability
-        |6. I'm done
+        |Valitse asetettava parametri
+        |1. Populaation koko (adjusting population size will affect current population)
+        |2. Sukupolven risteytysten enimmäismäärä
+        |3. Sukupolven mutaatioiden enimmäismäärä
+        |4. Mutaation todennäköisyys
+        |5. Valmis
       """.stripMargin
     )
-    console.getInt(1 to 6) match {
-      case 1 => copy(step = console.getFloat()).setParameters
-      case 2 => copy(populationSize = console.getInt()).setParameters
-      case 3 => copy(maxCrossoversPerGeneration = console.getInt(0 to populationSize)).setParameters
-      case 4 => copy(maxMutationsPerGeneration = console.getInt()).setParameters
-      case 5 => copy(mutationProbability = console.getFloat(0 to 1)).setParameters
+    console.getInt(1, 6) match {
+      case 1 => copy(populationSize = console.getInt()).promptSetParameters
+      case 2 => copy(maxCrossoversPerGeneration = console.getInt(0, populationSize)).promptSetParameters
+      case 3 => copy(maxMutationsPerGeneration = console.getInt()).promptSetParameters
+      case 4 => copy(mutationProbability = console.getFloat(0, 1)).promptSetParameters
       case _ => this
     }
   }
 
-  def setConstraints: Overseer = {
+  def promptManageVariables: Overseer = {
     println(toString)
     println(
       s"""
-         |Select which constraint you'd like to adjust
+         |Valitse muokattava muuttuja
          |${
-        constraints.zipWithIndex.map(c =>
-          s"${c._2 + 1}. ${c._1.text}" +
-            s"${if (c._1.limit != null) s" (value between ${c._1.limit.start} and ${c._1.limit.end}}" else ""}"
+        variables.zipWithIndex.map(c =>
+          s"${c._2 + 1}. ${c._1.text}"
         ).mkString("\n")
       }
-         |${constraints.length + 1}. I'm done
+         |${variables.length + 1}. Valmis
       """.stripMargin
     )
-    console.getInt(1 to constraints.length + 1) match {
-      case x if x < constraints.length + 1 => copy(
-        constraints = constraints.updated(
+    console.getInt(1, variables.length + 1) match {
+      case x if x < variables.length + 1 => copy(
+        variables = variables.updated(
           x - 1,
-          constraints(x - 1).copy(
-            value = constraints(x - 1).value match {
-              case _: Int => console.getInt()
-              case _: Float => console.getFloat()
-              case _ => StdIn.readLine
-            }
-          )
+          variables(x - 1)
+            .updated(console.getFloat(Some(0)), console.getFloat(Some(0)))
         )
-      ).setConstraints
+      ).promptManageVariables
       case _ => this
     }
   }
@@ -80,6 +67,19 @@ case class Overseer(
   def runGA(iterations: Int, population: Population = Population.generatePopulation(populationSize, 10)): Population =
     if (iterations > 0) runGA(iterations - 1, getNextGeneration(population))
     else population
+
+  override def toString: String =
+    s"""
+       |Parametrit
+       |\tPopulaation koko: ${populationSize}
+       |\tSukupolven risteytysten enimmäismäärä: ${maxCrossoversPerGeneration}
+       |\tSukupolven mutaatioiden enimmäismäärä: ${maxMutationsPerGeneration}
+       |\tMutaation todennäköisyys: ${mutationProbability}
+       |Muuttujat
+       |\t${
+      variables.mkString("\n\t")
+    }
+     """.stripMargin
 
   private def getNextGeneration(population: Population): Population = {
     if (population == null) return population
@@ -106,20 +106,4 @@ case class Overseer(
       }
     )
   }
-
-  override def toString: String =
-    s"""
-       |Parameters
-       |\tStep: ${step}
-       |\tPopulation size: ${populationSize}
-       |\tMaximum crossovers per generation: ${maxCrossoversPerGeneration}
-       |\tMaximum mutations per generation: ${maxMutationsPerGeneration}
-       |\tMutation probability: ${mutationProbability}
-       |Constraints
-       |\t${
-      constraints
-        .map(c => s"${c.text}: ${if (c.value == 0) "Not set" else s"${c.value}${if (c.unit == null) "" else c.unit}"}")
-        .mkString("\n\t")
-    }
-     """.stripMargin
 }

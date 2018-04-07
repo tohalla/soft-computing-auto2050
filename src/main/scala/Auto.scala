@@ -1,4 +1,4 @@
-import ga.{Genotype, Overseer, Population}
+import ga.{Overseer, Population}
 import util.console
 
 object Auto extends App {
@@ -10,19 +10,19 @@ object Auto extends App {
   def promptAction: Unit = {
     println(
       """
-        |Select action
-        |1. Genetic algorithm
-        |2. Set constraints
-        |3. Set parameters
-        |4. Exit
+        |Valitse toiminta
+        |1. Geneettinen algoritmi
+        |2. Hallinnoi muuttujia
+        |3. Hallinnoi parametreja
+        |4. Lopeta
       """.stripMargin
     )
 
-    console.getInt(1 to 4) match {
+    console.getInt(1, 4) match {
       case 1 => promptGA
-      case 2 => overseer = overseer.setConstraints
+      case 2 => overseer = overseer.promptManageVariables
       case 3 => {
-        overseer = overseer.setParameters
+        overseer = overseer.promptSetParameters
         population = population.resize(overseer.populationSize)
       }
       case _ => System.exit(0)
@@ -34,20 +34,22 @@ object Auto extends App {
   def promptGA: Unit = {
     println(
       s"""
-        |Current population:$population
+        |Nykyinen populaatio:$population
         |
-        |Select action
-        |1. Run n times
-        |2. Run until satisfactory result found
-        |3. Reset
-        |4. Return
+        |Valitse toiminta
+        |1. Suorita algoritmi N kertaa
+        |2. Suorita kunnes tyydyttävä tulos löytyy
+        |3. Nollaa populaatio
+        |4. Palaa takaisin
       """.stripMargin
     )
-    val action = console.getInt(1 to 4)
+    val action = console.getInt(1, 4)
     action match {
       case 1 => {
-        println("How many times you'd like to run GA for the current population?")
-        population = overseer.runGA(console.getInt(), population)
+        population = overseer.runGA(
+          console.getInt(query = Some("Kuinka monta kertaa GA suoritetaan?")),
+          population
+        )
       }
       case 3 => population = overseer.getRandomPopulation
       case _ =>
