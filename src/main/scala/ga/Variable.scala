@@ -16,7 +16,7 @@ case class Variable(text: String, unit: String, minValue: Float, maxValue: Float
     )
     console.getInt(1, 3) match {
       case 1 => {
-        val min = console.getFloat(query = Some("Aseta pienin mahdollinen arvo")))
+        val min = console.getFloat(query = Some("Aseta pienin mahdollinen arvo"))
         copy(
           minValue = min,
           maxValue = console.getFloat(minValue = Some(min), query = Some("Aseta suurin mahdollinen arvo"))
