@@ -9,14 +9,22 @@ case class Overseer(
   maxCrossoversPerGeneration: Int = 300,
   maxMutationsPerGeneration: Int = 100,
   mutationProbability: Float = .3f,
-  variables: Vector[Variable] = Vector(
-    new Variable("Time", "s", 0, 3600),
-    new Variable("Wood fuel volume", "m^3", 0, 1)
-    //    new Variable(0f, "Furnace volume", "m^3"),
-    //    new Variable(0f, "Water content", null, 0 to 1)
+  variables: Seq[Variable] = Seq(
+    new Variable("Ympäristön alkulämpötila", "ºC", 25, 25),
+    new Variable("Puuaineksen tilavuus", "m^3", 0, 50),
+    new Variable("Polttoastian tilavuus", "m^3", 0, 50),
+    new Variable("Savukaasujen poistumisvirtaus", "m^3 / s", 0, 5),
+    new Variable("Ilman sisäänvirtaus", "m^3 / s", 0, 5),
+    new Variable("Puun kosteuspitoisuus", null, .05f, .65f),
+    new Variable("Hiilen osuus kuivasta puusta", null, 0.114f, 0.156f),
+    new Variable("Vedyn osuus kuivasta puusta", null, 0.06f, 0.065f),
+    new Variable("Hapen osuus kuivasta puusta", null, 0.38f, 0.42f),
+    new Variable("Typen osuus kuivasta puusta", null, 0.001f, 0.005f),
+    new Variable("Rikin osuus kuivasta puusta", null, .0005f, .0005f),
+    new Variable("Tuhkan osuus kuivasta puusta", null, .004f, .006f)
   )
 ) {
-  def getRandomPopulation: Population = Population.generatePopulation(populationSize, variables.length)
+  def getRandomPopulation: Population = Population.generatePopulation(populationSize, variables.toSet)
 
   def promptSetParameters: Overseer = {
     println(toString)
@@ -43,7 +51,7 @@ case class Overseer(
     println(toString)
     println(
       s"""
-         |Valitse muokattava muuttuja
+         |Valitse muokattava muuttuja (muuttujien muokkaus nollaa nykyisen populaation)
          |${
         variables.zipWithIndex.map(c =>
           s"${c._2 + 1}. ${c._1.text}"
@@ -64,7 +72,10 @@ case class Overseer(
     }
   }
 
-  def runGA(iterations: Int, population: Population = Population.generatePopulation(populationSize, 10)): Population =
+  def runGA(
+    iterations: Int,
+    population: Population = Population.generatePopulation(populationSize, variables.toSet)
+  ): Population =
     if (iterations > 0) runGA(iterations - 1, getNextGeneration(population))
     else population
 
@@ -89,7 +100,7 @@ case class Overseer(
     def mutate(genotype: Genotype) =
       if (mutations < maxMutationsPerGeneration && mutationProbability >= Random.nextFloat) {
         mutations += 1
-        genotype.mutate()
+        genotype.mutate(variables(Random.nextInt(variables.length)))
       } else genotype
 
     val candidates = Random.shuffle(population.genotypes)

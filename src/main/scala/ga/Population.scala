@@ -6,7 +6,7 @@ case class Population(genotypes: Vector[Genotype]) {
   def resize(newSize: Int): Population =
     if (size == newSize) this
     else if (size < newSize)
-      copy(genotypes = genotypes ++ Vector.fill(newSize - size)(Genotype.generate(genotypes.head.size)))
+      copy(genotypes = genotypes ++ Vector.fill(newSize - size)(Genotype.generate(genotypes.head.genes.keySet)))
     else copy(genotypes = genotypes.take(newSize))
 
   override def toString: String =
@@ -23,7 +23,7 @@ case class Population(genotypes: Vector[Genotype]) {
 }
 
 object Population {
-  def generatePopulation(size: Int, geneCount: Int) = new Population(
-    genotypes = Vector.fill(size)(Genotype.generate(geneCount))
+  def generatePopulation(size: Int, variables: Set[Variable]) = new Population(
+    genotypes = Vector.fill(size)(Genotype.generate(variables))
   )
 }

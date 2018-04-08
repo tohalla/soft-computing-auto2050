@@ -21,10 +21,5 @@ object combustion {
     oxygen: Float,
     ash: Float
   ): Float =
-    0.3491f * coal +
-      1.1783f * hydrogen +
-      0.1005f * sulphur -
-      0.0151f * nitrogen -
-      0.1034f * oxygen -
-      0.0211f * ash
+    0.3491f * coal + 1.1783f * hydrogen + 0.1005f * sulphur - 0.0151f * nitrogen - 0.1034f * oxygen - 0.0211f * ash
 }

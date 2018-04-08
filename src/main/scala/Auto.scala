@@ -20,7 +20,11 @@ object Auto extends App {
 
     console.getInt(1, 4) match {
       case 1 => promptGA
-      case 2 => overseer = overseer.promptManageVariables
+      case 2 => {
+        val newOverseer = overseer.promptManageVariables
+        if (newOverseer.variables != overseer.variables) population = overseer.getRandomPopulation
+        overseer = newOverseer
+      }
       case 3 => {
         overseer = overseer.promptSetParameters
         population = population.resize(overseer.populationSize)

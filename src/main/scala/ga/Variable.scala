@@ -3,6 +3,11 @@ package ga
 import util.console
 
 case class Variable(text: String, unit: String, minValue: Float, maxValue: Float) {
+  val isFixed: Boolean = minValue == maxValue
+
+  def scaleValue(value: Float) =
+    if (isFixed) minValue else minValue + value * (maxValue - minValue)
+
   def updated(minValue: Float, maxValue: Float): Variable = copy(minValue = minValue, maxValue = maxValue)
 
   def promptManage: Variable = {
