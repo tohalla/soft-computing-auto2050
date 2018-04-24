@@ -2,17 +2,15 @@ package ga
 
 import scala.util.Random
 
-abstract class Entity {
+trait Entity {
   val genes: Map[Variable, Float]
-  val size = genes.size
+  val size: Int = genes.size
 
   override def toString: String = s"[${genes.mkString(",")}]"
 }
 
 case class Genotype(genes: Map[Variable, Float]) extends Entity {
-  def decode: Phenotype = new Phenotype(
-    genes = genes.map(gene => gene)
-  )
+  def decode: Phenotype = Phenotype(genes = genes.map(gene => (gene._1, gene._1.getScaledValue(gene._2))))
 
   def crossover(partner: Genotype, crossoverPoint: Int = Random.nextInt(size)): Genotype =
     if (crossoverPoint >= this.size) this
@@ -26,14 +24,17 @@ case class Genotype(genes: Map[Variable, Float]) extends Entity {
 }
 
 case class Phenotype(genes: Map[Variable, Float]) extends Entity {
-  def encode: Phenotype = new Phenotype(
-    genes = genes.map(gene => gene)
+  def encode: Genotype = Genotype(genes = genes.map(gene => (gene._1, gene._1.getValue(gene._2))))
+
+  def generate(variables: Set[Variable]): Genotype = Genotype(
+    genes = variables.zip(variables.map(variable => if (variable.isFixed) 1 else Random.nextFloat)).toMap
   )
 }
 
 object Genotype {
-  def generate(variables: Set[Variable]): Genotype = new Genotype(
+  def generate(variables: Set[Variable]): Genotype = Genotype(
     genes = variables.zip(variables.map(variable => if (variable.isFixed) 1 else Random.nextFloat)).toMap
   )
 }
+
 

@@ -1,7 +1,7 @@
 package ga
 
 case class Population(genotypes: Vector[Genotype]) {
-  val size = genotypes.length
+  val size: Int = genotypes.length
 
   def resize(newSize: Int): Population =
     if (size == newSize) this
@@ -14,16 +14,17 @@ case class Population(genotypes: Vector[Genotype]) {
        |Alkiot:
        |\t${
       if (size > 10)
-        genotypes.take(2).zipWithIndex.map { case (genotype, i) =>
-          s"(${i}): ${genotype}"
-        }.mkString(",\n\t") + s"\n\t...\n\t(${genotypes.length - 1}): ${genotypes.last}"
-      else genotypes.zipWithIndex.map { case (genotype, i) => s"(${i}): ${genotype}" } mkString (",\n\t")
+        genotypes
+          .take(2)
+          .zipWithIndex
+          .map { case (genotype, i) => s"($i): $genotype" }
+          .mkString(",\n\t") + s"\n\t...\n\t(${genotypes.length - 1}): ${genotypes.last}"
+      else genotypes.zipWithIndex.map { case (genotype, i) => s"($i): $genotype" } mkString ",\n\t"
     }
     """.stripMargin
 }
 
 object Population {
-  def generatePopulation(size: Int, variables: Set[Variable]) = new Population(
-    genotypes = Vector.fill(size)(Genotype.generate(variables))
-  )
+  def generatePopulation(size: Int, variables: Set[Variable]) =
+    Some(Population(genotypes = Vector.fill(size)(Genotype.generate(variables))))
 }

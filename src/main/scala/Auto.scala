@@ -1,13 +1,28 @@
-import ga.{Overseer, Population}
+import ga.{Overseer, Phenotype, Population, Variable}
 import util.console
 
 object Auto extends App {
-  var overseer = new Overseer()
-  var population: Population = overseer.getRandomPopulation
+  var overseer = Overseer(
+    fitnessFunction = (phenotype: Phenotype, variables: Seq[Variable]) => {
+      val x = phenotype.genes(variables.head)
+      val y = phenotype.genes(variables.head)
+      y * Math.sin(Math.sqrt(x*x+y*y)) / Math.sqrt(x*x+y*y) + y*Math.signum(x)
+    },
+    Seq(
+      Variable("x", "", -5, 5),
+      Variable("y", "", -5, 5),
+//      Variable("Ympäristön alkulämpötila", "ºC", 25, 25),
+//      Variable("Puuaineksen tilavuus", "m^3", 0, 50),
+//      Variable("Polttoastian tilavuus", "m^3", 0, 50),
+//      Variable("Savukaasujen poistumisvirtaus", "m^3 / s", 0, 5),
+//      Variable("Ilman sisäänvirtaus", "m^3 / s", 0, 5)
+    )
+  )
+  var population: Option[Population] = None
 
-  promptAction
+  promptAction()
 
-  def promptAction: Unit = {
+  def promptAction(): Unit = {
     println(
       """
         |Valitse toiminta
@@ -19,23 +34,21 @@ object Auto extends App {
     )
 
     console.getInt(1, 4) match {
-      case 1 => promptGA
-      case 2 => {
+      case 1 => promptGA()
+      case 2 =>
         val newOverseer = overseer.promptManageVariables
-        if (newOverseer.variables != overseer.variables) population = overseer.getRandomPopulation
+        if (newOverseer.variables != overseer.variables) population = None
         overseer = newOverseer
-      }
-      case 3 => {
+      case 3 =>
         overseer = overseer.promptSetParameters
-        population = population.resize(overseer.populationSize)
-      }
+        if (population.isDefined) population = Some(population.get.resize(overseer.populationSize))
       case _ => System.exit(0)
     }
 
-    promptAction
+    promptAction()
   }
 
-  def promptGA: Unit = {
+  def promptGA(): Unit = {
     println(
       s"""
         |Nykyinen populaatio:$population
@@ -49,17 +62,13 @@ object Auto extends App {
     )
     val action = console.getInt(1, 4)
     action match {
-      case 1 => {
-        population = overseer.runGA(
-          console.getInt(query = Some("Kuinka monta kertaa GA suoritetaan?")),
-          population
-        )
-      }
-      case 3 => population = overseer.getRandomPopulation
+      case 1 =>
+        population = overseer.runGA(console.getInt(query = Some("Kuinka monta kertaa GA suoritetaan?")))
+      case 3 => population = None
       case _ =>
     }
 
-    if (action < 4) promptGA
+    if (action < 4) promptGA()
   }
 
 }

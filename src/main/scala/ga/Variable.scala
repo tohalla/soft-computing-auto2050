@@ -5,8 +5,11 @@ import util.console
 case class Variable(text: String, unit: String, minValue: Float, maxValue: Float) {
   val isFixed: Boolean = minValue == maxValue
 
-  def scaleValue(value: Float) =
+  def getScaledValue(value: Float): Float =
     if (isFixed) minValue else minValue + value * (maxValue - minValue)
+
+  def getValue(scaledValue: Float): Float =
+    if (isFixed) 1f else (scaledValue - minValue) / (maxValue - minValue)
 
   def updated(minValue: Float, maxValue: Float): Variable = copy(minValue = minValue, maxValue = maxValue)
 
