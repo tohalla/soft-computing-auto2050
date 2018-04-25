@@ -5,13 +5,14 @@ import util.{console, misc}
 import scala.util.Random
 
 case class Overseer(
-  fitnessFunction: (Phenotype, Seq[Variable]) => Double,
+  getFitnessValue: (Phenotype, Seq[Variable]) => Double,
   variables: Seq[Variable],
+  selectionFunction: SelectionFunction = RankSelection,
   description: String = "",
   populationSize: Int = 300,
   maxCrossoversPerGeneration: Int = 300,
   maxMutationsPerGeneration: Int = 100,
-  mutationProbability: Float = .3f
+  mutationProbability: Float = .15f
 ) {
   def promptSetParameters: Overseer = {
     println(toString)
@@ -76,7 +77,6 @@ case class Overseer(
     }
      """.stripMargin
 
-
   private def generateNewPopulation(population: Option[Population] = None): Option[Population] = {
     if (population.isEmpty) return Population.generatePopulation(populationSize, variables.toSet)
     var mutations = 0
@@ -88,9 +88,8 @@ case class Overseer(
         genotype.mutate(variables(Random.nextInt(variables.length)))
       } else genotype
 
-    val candidates = Random.shuffle(population.get.genotypes)
-      .filter(_ => Random.nextFloat < .3f) // elimination, random elimination as placeholder
-      .map(mutate)
+    val candidates = selectionFunction.getCandidates(population.get)  // select candidates from population
+      .map(mutate) // ... and mutate
 
     Some(
       new Population(

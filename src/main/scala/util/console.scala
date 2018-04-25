@@ -9,11 +9,11 @@ object console {
   def getInt(
     minValue: Option[Int] = None,
     maxValue: Option[Int] = None,
-    query: Option[String] = Some("Syötä kokonaisluku")
+    query: Option[String] = Some("Syötä kokonaisluku ")
   ): Int = {
     if (query.isDefined)
       print(query +
-        (if (minValue.isEmpty && maxValue.isEmpty) "" else s" (${minValue.getOrElse("")} - ${maxValue.getOrElse("")})")
+        (if (minValue.isEmpty && maxValue.isEmpty) "" else s"(${minValue.getOrElse("")} - ${maxValue.getOrElse("")}) ")
       )
     val input = Try(StdIn.readInt()).getOrElse(getInt(minValue, maxValue))
     if (
@@ -29,7 +29,7 @@ object console {
   def getFloat(
     minValue: Option[Float] = None,
     maxValue: Option[Float] = None,
-    query: Option[String] = Some("Syötä liukuluku")
+    query: Option[String] = Some("Syötä liukuluku ")
   ): Float = {
     if (query.isDefined)
       println(query +

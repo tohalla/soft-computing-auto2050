@@ -1,21 +1,16 @@
-import ga.{Overseer, Phenotype, Population, Variable}
+import ga._
 import util.console
 
 object Auto extends App {
   var overseer = Overseer(
-    fitnessFunction = (phenotype: Phenotype, variables: Seq[Variable]) => {
+    getFitnessValue = (phenotype: Phenotype, variables: Seq[Variable]) => {
       val x = phenotype.genes(variables.head)
       val y = phenotype.genes(variables.head)
       y * Math.sin(Math.sqrt(x*x+y*y)) / Math.sqrt(x*x+y*y) + y*Math.signum(x)
     },
-    Seq(
+    variables = Seq(
       Variable("x", "", -5, 5),
-      Variable("y", "", -5, 5),
-//      Variable("Ympäristön alkulämpötila", "ºC", 25, 25),
-//      Variable("Puuaineksen tilavuus", "m^3", 0, 50),
-//      Variable("Polttoastian tilavuus", "m^3", 0, 50),
-//      Variable("Savukaasujen poistumisvirtaus", "m^3 / s", 0, 5),
-//      Variable("Ilman sisäänvirtaus", "m^3 / s", 0, 5)
+      Variable("y", "", -5, 5)
     )
   )
   var population: Option[Population] = None

@@ -9,7 +9,7 @@ trait Entity {
   override def toString: String = s"[${genes.mkString(",")}]"
 }
 
-case class Genotype(genes: Map[Variable, Float]) extends Entity {
+case class Genotype(genes: Map[Variable, Float], fitnessValue: Double = 0) extends Entity {
   def decode: Phenotype = Phenotype(genes = genes.map(gene => (gene._1, gene._1.getScaledValue(gene._2))))
 
   def crossover(partner: Genotype, crossoverPoint: Int = Random.nextInt(size)): Genotype =
