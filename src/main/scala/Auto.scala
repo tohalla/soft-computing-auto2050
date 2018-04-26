@@ -1,22 +1,45 @@
 import ga._
 import util.console
 
+import scala.annotation.tailrec
+
 object Auto extends App {
-  var overseer = Overseer(
-    getFitnessValue = (phenotype: Phenotype, variables: Seq[Variable]) => {
-      val x = phenotype.genes(variables.head)
-      val y = phenotype.genes(variables.head)
-      y * Math.sin(Math.sqrt(x*x+y*y)) / Math.sqrt(x*x+y*y) + y*Math.signum(x)
-    },
-    variables = Seq(
-      Variable("x", "", -5, 5),
-      Variable("y", "", -5, 5)
+    var overseer = Overseer(
+      getFitnessValue = (phenotype: Phenotype, variables: Seq[Variable]) => {
+        val x = phenotype.genes(variables.head)
+        val y = phenotype.genes(variables(1))
+        val len = Math.sqrt(x * x + y * y)
+        y * Math.sin(len) * len / (len + 1) + y * Math.signum(x)
+      },
+      variables = Seq(
+        Variable("x", "", -10, 10),
+        Variable("y", "", -10, 10)
+      ),
+      selectionFunction = RankedTournamentSelection
     )
-  )
+//  var overseer = Overseer(
+//    getFitnessValue = (phenotype: Phenotype, variables: Seq[Variable]) =>
+//      phenotype.genes(variables(0)) - phenotype.genes(variables(1)) +
+//        phenotype.genes(variables(2)) - phenotype.genes(variables(3)) +
+//        phenotype.genes(variables(4)) - phenotype.genes(variables(5)) +
+//        phenotype.genes(variables(6)) - phenotype.genes(variables(7)),
+//    variables = Seq(
+//      Variable("a", "", 0, 10),
+//      Variable("b", "", 0, 10),
+//      Variable("c", "", 0, 10),
+//      Variable("d", "", 0, 10),
+//      Variable("e", "", 0, 10),
+//      Variable("f", "", 0, 10),
+//      Variable("g", "", 0, 10),
+//      Variable("h", "", 0, 10)
+//    ),
+//    populationSize = 10
+//  )
   var population: Option[Population] = None
 
   promptAction()
 
+  @tailrec
   def promptAction(): Unit = {
     println(
       """
@@ -43,26 +66,26 @@ object Auto extends App {
     promptAction()
   }
 
+  @tailrec
   def promptGA(): Unit = {
+    if (population.isDefined) println(s"Nykyinen populaatio: ${population.get}")
     println(
       s"""
-        |Nykyinen populaatio:$population
-        |
-        |Valitse toiminta
-        |1. Suorita algoritmi N kertaa
-        |2. Suorita kunnes tyydyttävä tulos löytyy
-        |3. Nollaa populaatio
-        |4. Palaa takaisin
-      """.stripMargin
+         |Valitse toiminta
+         |1. Suorita algoritmi N kertaa
+         |2. Suorita kunnes tyydyttävä tulos löytyy
+         |3. Nollaa populaatio
+         |4. Palaa takaisin
+        """.stripMargin
     )
     val action = console.getInt(1, 4)
     action match {
       case 1 =>
-        population = overseer.runGA(console.getInt(query = Some("Kuinka monta kertaa GA suoritetaan?")))
-      case 3 => population = None
+        population = Some(overseer.runGA(console.getInt(query = Some("Kuinka monta kertaa GA suoritetaan?"))))
+      case 3 =>
+        population = None
       case _ =>
     }
-
     if (action < 4) promptGA()
   }
 

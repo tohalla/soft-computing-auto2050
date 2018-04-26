@@ -3,7 +3,7 @@ package ga
 import org.scalatest.FunSuite
 
 class PopulationTest extends FunSuite {
-  val variables = Set(
+  val variables = Seq(
     Variable("", "", minValue = 0, maxValue = 1),
     Variable("", "", minValue = 0, maxValue = 10),
     Variable("", "", minValue = 1, maxValue = 1),

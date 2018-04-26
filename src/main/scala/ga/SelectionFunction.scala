@@ -1,11 +1,12 @@
 package ga
 
+import scala.annotation.tailrec
 import scala.util.Random
 
 trait SelectionFunction {
-  def getCandidates(population: Population): Vector[Genotype]
+  def getParents(candidates: Vector[Genotype], parentCount: Int): Vector[(Genotype, Genotype)]
 
-  protected def getSurvivalProbability(genotype: Genotype, averageGenotype: Option[Genotype]): Float
+  def prepare(genotypes: Vector[Genotype]): Vector[Genotype] = sort(genotypes)
 
   // normalizes fitness values to range of [0,1]
   protected def normalizeFitness(genotypes: Vector[Genotype]): Vector[Genotype] = {
@@ -18,16 +19,40 @@ trait SelectionFunction {
 
   protected def sort(genotypes: Vector[Genotype]): Vector[Genotype] =
     genotypes.sortWith(_.fitnessValue > _.fitnessValue)
+
+  @tailrec
+  protected final def drawParent(candidatesWithProbabilities: Vector[(Genotype, Float)], i: Int = 0): Genotype =
+    if (i < candidatesWithProbabilities.length - 1 && candidatesWithProbabilities(i)._2 < Random.nextFloat)
+      drawParent(candidatesWithProbabilities, i + 1)
+    else {
+      candidatesWithProbabilities(i)._1
+    }
 }
 
 object RankSelection extends SelectionFunction {
-  def getSurvivalProbability(genotype: Genotype, averageGenotype: Option[Genotype]) = 0f
+  override def getParents(genotypes: Vector[Genotype], parentCount: Int): Vector[(Genotype, Genotype)] = {
+    val rankSum = (genotypes.length + 1) * genotypes.length / 2
+    val candidatesWithProbabilities = genotypes.zip(Vector.tabulate(genotypes.length)(i => (i + 1f) / rankSum).reverse)
+    Vector.fill(parentCount)(
+      (drawParent(candidatesWithProbabilities), drawParent(candidatesWithProbabilities))
+    )
+  }
+}
 
-  override def getCandidates(population: Population): Vector[Genotype] =
-    sort(population.genotypes)
-      .zipWithIndex
-      .foldLeft(Vector.empty[Genotype])((a, c) =>
-        if (1f / (2f + c._2) >= Random.nextFloat) a :+ c._1 else a
-      )
+object RankedTournamentSelection extends SelectionFunction {
+  val tournamentSize: Int = 4
+
+  override def prepare(genotypes: Vector[Genotype]): Vector[Genotype] = genotypes
+
+  override def getParents(genotypes: Vector[Genotype], parentCount: Int): Vector[(Genotype, Genotype)] = {
+    val rankSum = (tournamentSize + 1) * tournamentSize / 2
+    val probabilities = Vector.tabulate(tournamentSize)(i => (i + 1f) / rankSum)
+    Vector.fill(parentCount)({
+      val candidatesWithProbabilities = sort(Vector.fill(tournamentSize)(genotypes(Random.nextInt(genotypes.length))))
+        .zip(probabilities)
+      (drawParent(candidatesWithProbabilities), drawParent(candidatesWithProbabilities))
+    })
+  }
 
 }
+
