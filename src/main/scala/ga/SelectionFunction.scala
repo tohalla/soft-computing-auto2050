@@ -42,8 +42,6 @@ object RankSelection extends SelectionFunction {
 object RankedTournamentSelection extends SelectionFunction {
   val tournamentSize: Int = 4
 
-  override def prepare(genotypes: Vector[Genotype]): Vector[Genotype] = genotypes
-
   override def getParents(genotypes: Vector[Genotype], parentCount: Int): Vector[(Genotype, Genotype)] = {
     val rankSum = (tournamentSize + 1) * tournamentSize / 2
     val probabilities = Vector.tabulate(tournamentSize)(i => (i + 1f) / rankSum)

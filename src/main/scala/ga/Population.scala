@@ -9,12 +9,14 @@ case class Population(genotypes: Vector[Genotype]) {
       copy(genotypes = genotypes ++ Vector.fill(newSize - size)(Genotype.generate(genotypes.head.genes.keySet.toSeq)))
     else copy(genotypes = genotypes.take(newSize))
 
-  override def toString: String = {
+  override def toString: String = toString(true)
+
+  def toString(truncate: Boolean = true): String = {
     val sorted = genotypes.sortWith(_.fitnessValue > _.fitnessValue)
     s"""
        |Alkiot:
        |\t${
-      if (size > 10)
+      if (size > 10 && truncate)
         sorted
           .take(2)
           .zipWithIndex

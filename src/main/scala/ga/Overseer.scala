@@ -66,11 +66,11 @@ case class Overseer(
     if (iterations > 0) runGA(iterations - 1, generateNewPopulation(population))
     else {
       val p = population.getOrElse(generateNewPopulation(population).get)
-      p.copy(genotypes = genotypesWithUpdatedFitnessValue(p.genotypes))
+      p.copy(genotypes = genotypesWithUpdatedFitnessValue(p.genotypes.sortWith(_.fitnessValue > _.fitnessValue)))
     }
 
   override def toString: String =
-    s"""
+   s"""
        |Parametrit
        |\tPopulaation koko: $populationSize
        |\tRisteytyksen todennäköisyys: $crossOverProbability

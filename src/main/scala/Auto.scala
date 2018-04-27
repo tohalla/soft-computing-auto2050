@@ -12,8 +12,8 @@ object Auto extends App {
         y * Math.sin(len) * len / (len + 1) + y * Math.signum(x)
       },
       variables = Seq(
-        Variable("x", "", -10, 10),
-        Variable("y", "", -10, 10)
+        Variable("x", "", -20, 20),
+        Variable("y", "", -20, 20)
       ),
       selectionFunction = RankedTournamentSelection
     )
@@ -67,13 +67,13 @@ object Auto extends App {
   }
 
   @tailrec
-  def promptGA(): Unit = {
-    if (population.isDefined) println(s"Nykyinen populaatio: ${population.get}")
+  def promptGA(printPopulation: Boolean = true): Unit = {
+    if (population.isDefined && printPopulation) println(s"Nykyinen populaatio: ${population.get}")
     println(
       s"""
          |Valitse toiminta
          |1. Suorita algoritmi N kertaa
-         |2. Suorita kunnes tyydyttävä tulos löytyy
+         |2. Tulosta koko populaatio
          |3. Nollaa populaatio
          |4. Palaa takaisin
         """.stripMargin
@@ -81,12 +81,19 @@ object Auto extends App {
     val action = console.getInt(1, 4)
     action match {
       case 1 =>
-        population = Some(overseer.runGA(console.getInt(query = Some("Kuinka monta kertaa GA suoritetaan?"))))
+        population = Some(
+          overseer.runGA(console.getInt(query = Some("Kuinka monta kertaa GA suoritetaan?")), population)
+        )
+      case 2 =>
+        if (population.isDefined)
+          println(population.get.toString(false))
+        else
+          println("Populaatiota ei ole alustettu")
       case 3 =>
         population = None
       case _ =>
     }
-    if (action < 4) promptGA()
+    if (action < 4) promptGA(action != 2)
   }
 
 }
