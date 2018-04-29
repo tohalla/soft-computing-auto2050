@@ -12,7 +12,7 @@ object console {
     query: Option[String] = Some("Syötä kokonaisluku ")
   ): Int = {
     if (query.isDefined)
-      print(query +
+      print(query.get +
         (if (minValue.isEmpty && maxValue.isEmpty) "" else s"(${minValue.getOrElse("")} - ${maxValue.getOrElse("")}) ")
       )
     val input = Try(StdIn.readInt()).getOrElse(getInt(minValue, maxValue))
@@ -32,7 +32,7 @@ object console {
     query: Option[String] = Some("Syötä liukuluku ")
   ): Float = {
     if (query.isDefined)
-      println(query +
+      println(query.get +
         (if (minValue.isEmpty && maxValue.isEmpty) "" else s" (${minValue.getOrElse("")} - ${maxValue.getOrElse("")})")
       )
     val input = Try(StdIn.readFloat()).getOrElse(getFloat(minValue, maxValue))

@@ -6,7 +6,7 @@ case class Population(genotypes: Vector[Genotype]) {
   def resize(newSize: Int): Population =
     if (size == newSize) this
     else if (size < newSize)
-      copy(genotypes = genotypes ++ Vector.fill(newSize - size)(Genotype.generate(genotypes.head.genes.keySet.toSeq)))
+      copy(genotypes = genotypes ++ Vector.fill(newSize - size)(Genotype.generate(genotypes.head.alleles.keySet.toSeq)))
     else copy(genotypes = genotypes.take(newSize))
 
   override def toString: String = toString(true)
@@ -22,7 +22,7 @@ case class Population(genotypes: Vector[Genotype]) {
           .zipWithIndex
           .map { case (genotype, i) => s"($i): $genotype" }
           .mkString(",\n\t") + s"\n\t...\n\t(${genotypes.length - 1}): ${genotypes.last}"
-      else genotypes.zipWithIndex.map { case (genotype, i) => s"($i): $genotype" } mkString ",\n\t"
+      else sorted.zipWithIndex.map { case (genotype, i) => s"($i): $genotype" } mkString ",\n\t"
     }
     """.stripMargin
   }

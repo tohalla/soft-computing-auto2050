@@ -4,63 +4,48 @@ import util.console
 import scala.annotation.tailrec
 
 object Auto extends App {
-    var overseer = Overseer(
-      getFitnessValue = (phenotype: Phenotype, variables: Seq[Variable]) => {
-        val x = phenotype.genes(variables.head)
-        val y = phenotype.genes(variables(1))
-        val len = Math.sqrt(x * x + y * y)
-        y * Math.sin(len) * len / (len + 1) + y * Math.signum(x)
-      },
-      variables = Seq(
-        Variable("x", "", -20, 20),
-        Variable("y", "", -20, 20)
-      ),
-      selectionFunction = RankedTournamentSelection
-    )
-//  var overseer = Overseer(
-//    getFitnessValue = (phenotype: Phenotype, variables: Seq[Variable]) =>
-//      phenotype.genes(variables(0)) - phenotype.genes(variables(1)) +
-//        phenotype.genes(variables(2)) - phenotype.genes(variables(3)) +
-//        phenotype.genes(variables(4)) - phenotype.genes(variables(5)) +
-//        phenotype.genes(variables(6)) - phenotype.genes(variables(7)),
-//    variables = Seq(
-//      Variable("a", "", 0, 10),
-//      Variable("b", "", 0, 10),
-//      Variable("c", "", 0, 10),
-//      Variable("d", "", 0, 10),
-//      Variable("e", "", 0, 10),
-//      Variable("f", "", 0, 10),
-//      Variable("g", "", 0, 10),
-//      Variable("h", "", 0, 10)
-//    ),
-//    populationSize = 10
-//  )
+  var overseer: Option[Overseer] = None
   var population: Option[Population] = None
 
   promptAction()
 
+  def promptOverseerSelection(): Unit = {
+    println("Valitse geneettisen algoritmin kohde")
+    Overseer.overseers.zipWithIndex.foreach { case (overseer, index) =>
+      println(s"${index + 1}. ${overseer.description}")
+    }
+    overseer = Some(Overseer.overseers(console.getInt(1, Overseer.overseers.length) - 1))
+  }
+
   @tailrec
   def promptAction(): Unit = {
-    println(
-      """
-        |Valitse toiminta
-        |1. Geneettinen algoritmi
-        |2. Hallinnoi muuttujia
-        |3. Hallinnoi parametreja
-        |4. Lopeta
-      """.stripMargin
-    )
+    if (overseer.isEmpty)
+      promptOverseerSelection()
+    else {
+      println(
+        """
+          |Valitse toiminta
+          |1. Geneettinen algoritmi
+          |2. Hallinnoi muuttujia
+          |3. Hallinnoi parametreja
+          |4. Valitse toinen sovelluskohde
+          |5. Lopeta
+        """.stripMargin
+      )
 
-    console.getInt(1, 4) match {
-      case 1 => promptGA()
-      case 2 =>
-        val newOverseer = overseer.promptManageVariables
-        if (newOverseer.variables != overseer.variables) population = None
-        overseer = newOverseer
-      case 3 =>
-        overseer = overseer.promptSetParameters
-        if (population.isDefined) population = Some(population.get.resize(overseer.populationSize))
-      case _ => System.exit(0)
+      console.getInt(1, 5) match {
+        case 1 => promptGA()
+        case 2 =>
+          val newOverseer = overseer.get.promptManageVariables
+          if (newOverseer.variables != overseer.get.variables) population = None
+          overseer = Some(newOverseer)
+        case 3 =>
+          overseer = Some(overseer.get.promptSetParameters)
+          if (population.isDefined) population = Some(population.get.resize(overseer.get.populationSize))
+        case 4 =>
+          promptOverseerSelection()
+        case _ => System.exit(0)
+      }
     }
 
     promptAction()
@@ -82,7 +67,7 @@ object Auto extends App {
     action match {
       case 1 =>
         population = Some(
-          overseer.runGA(console.getInt(query = Some("Kuinka monta kertaa GA suoritetaan?")), population)
+          overseer.get.runGA(console.getInt(query = Some("Kuinka monta kertaa GA suoritetaan?")), population)
         )
       case 2 =>
         if (population.isDefined)

@@ -6,10 +6,10 @@ import scala.annotation.tailrec
 import scala.util.Random
 
 case class Overseer(
+  description: String,
   getFitnessValue: (Phenotype, Seq[Variable]) => Double,
   variables: Seq[Variable],
-  selectionFunction: SelectionFunction = RankSelection,
-  description: String = "",
+  parentSelection: ParentSelection = RankSelection,
   populationSize: Int = 300,
   elitism: Int = 1,
   mutationProbability: Float = .3f,
@@ -21,13 +21,13 @@ case class Overseer(
     println(
       """
         |Valitse asetettava parametri
-        |1. Populaation koko (adjusting population size will affect current population)
+        |1. Populaation koko (populaation koon muuttaminen saattaa muuttaa nykyistä populaatiota)
         |2. Risteytyksen todennäköisyys
-        |4. Mutaation todennäköisyys
-        |5. Valmis
+        |3. Mutaation todennäköisyys
+        |4. Valmis
       """.stripMargin
     )
-    console.getInt(1, 6) match {
+    console.getInt(1, 4) match {
       case 1 => copy(populationSize = console.getInt()).promptSetParameters
       case 2 => copy(crossOverProbability = console.getFloat(0, 1)).promptSetParameters
       case 3 => copy(mutationProbability = console.getFloat(0, 1)).promptSetParameters
@@ -41,21 +41,22 @@ case class Overseer(
     println(
       s"""
          |Valitse muokattava muuttuja (muuttujien muokkaus nollaa nykyisen populaation)
-         |${
-        variables.zipWithIndex.map(c =>
-          s"${c._2 + 1}. ${c._1.text}"
-        ).mkString("\n")
-      }
+         |${variables.zipWithIndex.map(c => s"${c._2 + 1}. ${c._1.text}").mkString("\n")}
          |${variables.length + 1}. Valmis
       """.stripMargin
     )
     console.getInt(1, variables.length + 1) match {
       case x if x < variables.length + 1 => copy(
-        variables = variables.updated(
-          x - 1,
-          variables(x - 1)
-            .updated(console.getFloat(Some(0)), console.getFloat(Some(0)))
+        variables = {
+          val min = console.getFloat(query = Some("Aseta pienin sallittu arvo"))
+          variables.updated(
+            x - 1,
+            variables(x - 1).updated(
+              min,
+              console.getFloat(minValue = Some(min), query = Some("Aseta suurin sallittu arvo"))
+            )
         )
+        }
       ).promptManageVariables
       case _ => this
     }
@@ -70,7 +71,7 @@ case class Overseer(
     }
 
   override def toString: String =
-   s"""
+    s"""
        |Parametrit
        |\tPopulaation koko: $populationSize
        |\tRisteytyksen todennäköisyys: $crossOverProbability
@@ -88,7 +89,7 @@ case class Overseer(
     if (parents._1.size != parents._2.size || crossOverProbability < Random.nextFloat)
       Vector(parents._1, parents._2)
     else {
-      val genes = parents._1.genes.keys.foldLeft((parents._1.genes, parents._2.genes))((a, c) =>
+      val genes = parents._1.alleles.keys.foldLeft((parents._1.alleles, parents._2.alleles))((a, c) =>
         if (Random.nextBoolean) (
           a._1.updated(c, a._2(c)),
           a._2.updated(c, a._1(c))
@@ -101,7 +102,7 @@ case class Overseer(
     if (population.isEmpty) Population.generatePopulation(populationSize, variables, Some(getFitnessValue))
     else {
       // prepare and update fitness value of parent candidates
-      val candidates = selectionFunction.prepare(genotypesWithUpdatedFitnessValue(population.get.genotypes))
+      val candidates = parentSelection.prepare(genotypesWithUpdatedFitnessValue(population.get.genotypes))
       val parentCount = Math.ceil((populationSize - elitism) / 2).toInt
 
       Some(
@@ -109,7 +110,7 @@ case class Overseer(
           genotypes = (
             (if (elitism > 0) candidates.take(elitism) else Vector.empty) ++
               Vector.fill(parentCount)(
-                selectionFunction.getParents(population.get.genotypes, parentCount).flatMap(crossover)
+                parentSelection.getParents(population.get.genotypes, parentCount).flatMap(crossover)
               )
                 .flatten
                 // ... and mutate
@@ -118,4 +119,43 @@ case class Overseer(
         )
       )
     }
+}
+
+object Overseer {
+  val overseers = Vector(
+    Overseer(
+      description = "y * sin(sqrt(x^2 + y^2)) + x * sign(y)",
+      getFitnessValue = (phenotype: Phenotype, variables: Seq[Variable]) => {
+        val x = phenotype.alleles(variables.head)
+        val y = phenotype.alleles(variables(1))
+        y * Math.sin(Math.sqrt(x * x + y * y)) + x * Math.signum(y)
+      },
+      variables = Seq(
+        Variable("x", "", -20, 20),
+        Variable("y", "", -20, 20)
+      ),
+      parentSelection = RankedTournamentSelection,
+      populationSize = 10
+    ),
+    Overseer(
+      description = "a - b + c - d + e - f + g - h",
+      getFitnessValue = (phenotype: Phenotype, variables: Seq[Variable]) =>
+        phenotype.alleles(variables(0)) - phenotype.alleles(variables(1)) +
+          phenotype.alleles(variables(2)) - phenotype.alleles(variables(3)) +
+          phenotype.alleles(variables(4)) - phenotype.alleles(variables(5)) +
+          phenotype.alleles(variables(6)) - phenotype.alleles(variables(7)),
+      variables = Seq(
+        Variable("a", "", 0, 20),
+        Variable("b", "", 0, 20),
+        Variable("c", "", 0, 20),
+        Variable("d", "", 0, 20),
+        Variable("e", "", 0, 20),
+        Variable("f", "", 0, 20),
+        Variable("g", "", 0, 20),
+        Variable("h", "", 0, 20)
+      ),
+      parentSelection = RankedTournamentSelection,
+      populationSize = 10
+    )
+  )
 }
