@@ -21,7 +21,7 @@ case class Population(genotypes: Vector[Genotype]) {
           .take(2)
           .zipWithIndex
           .map { case (genotype, i) => s"($i): $genotype" }
-          .mkString(",\n\t") + s"\n\t...\n\t(${genotypes.length - 1}): ${genotypes.last}"
+          .mkString(",\n\t") + s"\n\t...\n\t(${genotypes.length - 1}): ${sorted.last}"
       else sorted.zipWithIndex.map { case (genotype, i) => s"($i): $genotype" } mkString ",\n\t"
     }
     """.stripMargin

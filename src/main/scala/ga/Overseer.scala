@@ -55,7 +55,7 @@ case class Overseer(
               min,
               console.getFloat(minValue = Some(min), query = Some("Aseta suurin sallittu arvo"))
             )
-        )
+          )
         }
       ).promptManageVariables
       case _ => this
@@ -103,16 +103,13 @@ case class Overseer(
     else {
       // prepare and update fitness value of parent candidates
       val candidates = parentSelection.prepare(genotypesWithUpdatedFitnessValue(population.get.genotypes))
-      val parentCount = Math.ceil((populationSize - elitism) / 2).toInt
+      val parentCount = Math.ceil((populationSize - elitism) / 2f).toInt
 
       Some(
         new Population(
           genotypes = (
             (if (elitism > 0) candidates.take(elitism) else Vector.empty) ++
-              Vector.fill(parentCount)(
-                parentSelection.getParents(population.get.genotypes, parentCount).flatMap(crossover)
-              )
-                .flatten
+              parentSelection.getParents(population.get.genotypes, parentCount).flatMap(crossover)
                 // ... and mutate
                 .map(genotype => if (mutationProbability >= Random.nextFloat) genotype.mutate else genotype)
             ).take(populationSize)
@@ -134,7 +131,7 @@ object Overseer {
         Variable("x", "", -20, 20),
         Variable("y", "", -20, 20)
       ),
-      parentSelection = RankedTournamentSelection,
+      parentSelection = RankSelection,
       populationSize = 10
     ),
     Overseer(
