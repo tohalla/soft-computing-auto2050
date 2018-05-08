@@ -3,14 +3,16 @@ package ga
 case class Population(genotypes: Vector[Genotype]) {
   val size: Int = genotypes.length
 
+  // Palauttaa skaalatun populaation
   def resize(newSize: Int): Population =
     if (size == newSize) this
-    else if (size < newSize)
+    else if (size < newSize) // jos tarve kasvattaa populaatiota, lisätään satunnaisia alkioita
       copy(genotypes = genotypes ++ Vector.fill(newSize - size)(Genotype.generate(genotypes.head.alleles.keySet.toSeq)))
-    else copy(genotypes = genotypes.take(newSize))
+    else copy(genotypes = genotypes.take(newSize)) // ... muutoin valitaan alkupäästä uuden populaation koon verran alkioita
 
   override def toString: String = toString(true)
 
+  // funktio alkioiden tulostamista varten
   def toString(truncate: Boolean = true): String = {
     val sorted = genotypes.sortWith(_.fitnessValue > _.fitnessValue)
     s"""
@@ -29,6 +31,12 @@ case class Population(genotypes: Vector[Genotype]) {
 }
 
 object Population {
+  /**
+    * @param size Uuden populaation koko
+    * @param variables Lista alkioiden sisältämistä muuttujista
+    * @param getFitnessValue Funktio kelvollisuusarvon laskua varten
+    * @return
+    */
   def generatePopulation(
     size: Int,
     variables: Seq[Variable],

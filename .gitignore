@@ -8,6 +8,7 @@ training-data/
 .history/
 .lib/
 dist/*
+out/*
 target/
 lib_managed/
 src_managed/

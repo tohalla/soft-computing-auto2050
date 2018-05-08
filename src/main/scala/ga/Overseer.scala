@@ -7,12 +7,13 @@ import scala.util.Random
 
 case class Overseer(
   description: String,
-  getFitnessValue: (Phenotype, Seq[Variable]) => Double,
+  getFitnessValue: (Phenotype, Seq[Variable]) => Double, // jossa isompi kelvollisuusarvo = suurempi todennäköisyys
+  // siirtää informaatiota seuraavaan populaatioon
   variables: Seq[Variable],
   parentSelection: ParentSelection = RankSelection,
-  populationSize: Int = 300,
-  elitism: Int = 1,
-  mutationProbability: Float = .3f,
+  populationSize: Int = 80,
+  elitism: Int = 1, // kuinka monta parasta ratkaisua siiretään suoraan seuraavaan populaatioon
+  mutationProbability: Float = .08f,
   crossOverProbability: Float = .8f
 ) {
   @tailrec
@@ -24,13 +25,15 @@ case class Overseer(
         |1. Populaation koko (populaation koon muuttaminen saattaa muuttaa nykyistä populaatiota)
         |2. Risteytyksen todennäköisyys
         |3. Mutaation todennäköisyys
-        |4. Valmis
+        |4. Elitismi
+        |5. Valmis
       """.stripMargin
     )
-    console.getInt(1, 4) match {
+    console.getInt(1, 5) match {
       case 1 => copy(populationSize = console.getInt()).promptSetParameters
       case 2 => copy(crossOverProbability = console.getFloat(0, 1)).promptSetParameters
       case 3 => copy(mutationProbability = console.getFloat(0, 1)).promptSetParameters
+      case 4 => copy(elitism = console.getInt(maxValue = Some(populationSize))).promptSetParameters
       case _ => this
     }
   }
@@ -62,6 +65,7 @@ case class Overseer(
     }
   }
 
+  // Funktio geneettisen algoritmin suorittamiseen N kertaa, palauttaa viimeisen populaation
   @tailrec
   final def runGA(iterations: Int, population: Option[Population] = None): Population =
     if (iterations > 0) runGA(iterations - 1, generateNewPopulation(population))
@@ -76,6 +80,7 @@ case class Overseer(
        |\tPopulaation koko: $populationSize
        |\tRisteytyksen todennäköisyys: $crossOverProbability
        |\tMutaation todennäköisyys: $mutationProbability
+       |\tElitismi: $elitism
        |Muuttujat
        |\t${
       variables.mkString("\n\t")
@@ -85,6 +90,7 @@ case class Overseer(
   private def genotypesWithUpdatedFitnessValue(genotypes: Vector[Genotype]): Vector[Genotype] =
     genotypes.map(genotype => genotype.copy(fitnessValue = getFitnessValue(genotype.decode, variables)))
 
+  //
   private def crossover(parents: (Genotype, Genotype)): Vector[Genotype] =
     if (parents._1.size != parents._2.size || crossOverProbability < Random.nextFloat)
       Vector(parents._1, parents._2)
@@ -98,20 +104,20 @@ case class Overseer(
       Vector(Genotype(genes._1), Genotype(genes._2))
     }
 
+  // Luo annetusta populaatiosta uuden populaation
   private def generateNewPopulation(population: Option[Population] = None): Option[Population] =
     if (population.isEmpty) Population.generatePopulation(populationSize, variables, Some(getFitnessValue))
     else {
-      // prepare and update fitness value of parent candidates
-      val candidates = parentSelection.prepare(genotypesWithUpdatedFitnessValue(population.get.genotypes))
+      val candidates = genotypesWithUpdatedFitnessValue(population.get.genotypes)
+        .sortWith(_.fitnessValue > _.fitnessValue)
       val parentCount = Math.ceil((populationSize - elitism) / 2f).toInt
 
       Some(
         new Population(
           genotypes = (
             (if (elitism > 0) candidates.take(elitism) else Vector.empty) ++
-              parentSelection.getParents(population.get.genotypes, parentCount).flatMap(crossover)
-                // ... and mutate
-                .map(genotype => if (mutationProbability >= Random.nextFloat) genotype.mutate else genotype)
+              parentSelection.getParents(candidates, parentCount).flatMap(crossover)
+                .map(_.mutate(mutationProbability)) // mutaatio
             ).take(populationSize)
         )
       )
@@ -119,6 +125,7 @@ case class Overseer(
 }
 
 object Overseer {
+  // Sovelluksen valmiit valvoja -luokan oliot
   val overseers = Vector(
     Overseer(
       description = "y * sin(sqrt(x^2 + y^2)) + x * sign(y)",
@@ -131,8 +138,9 @@ object Overseer {
         Variable("x", "", -20, 20),
         Variable("y", "", -20, 20)
       ),
-      parentSelection = RankSelection,
-      populationSize = 10
+      parentSelection = RankedTournamentSelection,
+      populationSize = 50,
+      mutationProbability = .25f
     ),
     Overseer(
       description = "a - b + c - d + e - f + g - h",
@@ -151,8 +159,8 @@ object Overseer {
         Variable("g", "", 0, 20),
         Variable("h", "", 0, 20)
       ),
-      parentSelection = RankedTournamentSelection,
-      populationSize = 10
+      parentSelection = RankSelection,
+      populationSize = 75
     )
   )
 }

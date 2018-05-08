@@ -22,9 +22,11 @@ object misc {
 
   def randomDoubleExclude(exclude: Double): Double = randomDoubleExclude(Set(exclude))
 
+  // ei nykyisellään käytössä
   def getDistance(a: Seq[Double], b: Seq[Double]): Double =
     Math.sqrt(a.zip(b).map(i => Math.pow(i._1 - i._2, 2)).sum)
 
+  // Normaalijakautunut satunnaisluku
   def getGaussianRandom(mean: Float = 0, standardDeviation: Float = .10f): Float = (
     mean +
       standardDeviation *

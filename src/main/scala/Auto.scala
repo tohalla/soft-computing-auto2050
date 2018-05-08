@@ -1,10 +1,12 @@
 import ga._
 import util.console
+import org.sameersingh.scalaplot.Implicits._
 
 import scala.annotation.tailrec
 
 object Auto extends App {
   var overseer: Option[Overseer] = None
+  var visualization: Boolean = true
   var population: Option[Population] = None
 
   promptAction()
@@ -14,6 +16,7 @@ object Auto extends App {
     Overseer.overseers.zipWithIndex.foreach { case (overseer, index) =>
       println(s"${index + 1}. ${overseer.description}")
     }
+    population = None
     overseer = Some(Overseer.overseers(console.getInt(1, Overseer.overseers.length) - 1))
   }
 
@@ -58,27 +61,52 @@ object Auto extends App {
       s"""
          |Valitse toiminta
          |1. Suorita algoritmi N kertaa
-         |2. Tulosta koko populaatio
-         |3. Nollaa populaatio
-         |4. Palaa takaisin
+         |2. Graafinen seuranta: $visualization
+         |3. Tulosta koko populaatio
+         |4. Nollaa populaatio
+         |5. Palaa takaisin
         """.stripMargin
     )
-    val action = console.getInt(1, 4)
+    val action = console.getInt(1, 5)
     action match {
       case 1 =>
-        population = Some(
-          overseer.get.runGA(console.getInt(query = Some("Kuinka monta kertaa GA suoritetaan?")), population)
-        )
+        val iterations = console.getInt(query = Some("Kuinka monta kertaa GA suoritetaan?"))
+        if (visualization) { // esitetään kuvaaja käyttäjälle
+          val curves = (0 to iterations).foldLeft((Seq.empty[Double], Seq.empty[Double]))((a, i) => {
+            population = Some(overseer.get.runGA(1, population))
+            val genotypes = population.get.genotypes.sortWith(_.fitnessValue > _.fitnessValue)
+            (
+              a._1 :+ genotypes.head.fitnessValue,
+              a._2 :+ genotypes.foldLeft(0d)(_ + _.fitnessValue) / population.get.size
+            )
+          })
+          val x = 0 to iterations map(_.toDouble)
+          output(GUI, xyChart(
+            List(
+              x -> Y(curves._1, "Paras arvo"),
+              x -> Y(curves._2, "Keskiarvo")
+            ),
+            x = Axis(label = "Sykli"),
+            y = Axis(label = "Kelvollisuusarvo"),
+            showLegend = true
+          ))
+        }
+        else population = Some(overseer.get.runGA(iterations, population))
+
+        // ... lajitellaan vielä kelvollisuusarvon perusteella
+        population = population.get.copy(genotypes = population.get.genotypes.sortWith(_.fitnessValue > _.fitnessValue))
       case 2 =>
+        visualization = !visualization
+      case 3 =>
         if (population.isDefined)
           println(population.get.toString(false))
         else
           println("Populaatiota ei ole alustettu")
-      case 3 =>
+      case 4 =>
         population = None
       case _ =>
     }
-    if (action < 4) promptGA(action != 2)
+    if (action < 5) promptGA(action != 3)
   }
 
 }
