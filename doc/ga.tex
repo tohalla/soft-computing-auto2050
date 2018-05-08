@@ -1,3 +1,31 @@
 \section{Geneettinen algoritmi}
 
-\input{kelvollisuusarvo}
+Geneettinen algoritmi on luonnollisen valinnan inspiroima stokastinen,
+eli satunnaisuuteen perustuva, etsimis- ja optimointiprosessi.
+Sen aikana käytetään \textit{periytymisen}, \textit{mutaatioiden} ja \textit{risteytysten}
+prosesseja, joilla pyritään löytämään riittävän soveltuva ratkaisu tarkasteltavaan
+ongelmaan.
+
+Geneettinen algoritmi eroaa muista tavanomaisemmista haku ja optimointimenetelmistä
+siten, että sen aikana käsitellään pikemminkin parametreille asetettuja arvoja, kuin parametreja itsessään.
+Näin ollen ratkaisut tehdään parametrien avulla lasketun tuloksen perusteella sen sijaan, että käytettäisiin apuna
+jotain johdettua informaatiota, kuten derivaattoja. Tavanomaisesti parametrien avulla lasketun arvon
+perusteella määritellään kyseisen arvojoukon \textit{kelvollisuus}, ja siten mahdollisuus siirtää tietoa seuraavaan
+optimointisykliin.
+
+GA kannattaa käyttää ongelmissa, joissa ei välttämättä tarvita parasta mahdollista ratkaisua,
+vaan riittävän hyvän tuloksen saavuttaminen katsotaan sopivaksi. Menetelmä sopii hyvin myös
+ongelmiin, joissa erillaisten ratkaisujen arvojoukko on laaja ja monimutkainen. Näin ollen menetelmää
+voidaan käyttää esimerkiksi NP-täydellisten ongelmien lähes optimaalisten ratkaisuje etsimiseen.
+Geneettisen algoritmin tukena on lisäksi mahdollista käyttää muita menetelmiä.
+Geneettinen algoritmi on hyvin skaalautuva, ja sitä voidaan käyttää useista
+muuttujista riippuvien ratkaisujen etsimiseen.
+GA:n eduksi voidaan katsoa myös se, että menetelmässä löydetään useita hyviä ratkaisuja.
+
+Mutaatioilla on iso rooli GA:n toiminnassa, sillä ne ovat ainoa tapa tuoda uutta informaatiota populaatioon.
+Mutaation aikana joitain \textit{genotyypin}, eli tietokonemuotoisen ratkaisun, arvoja muutetaan
+sattumanvaraisesti. Risteytyksessä luodaan uusia alkioita yhdistelemällä kahden tai useamman populaation
+jäsenen sisältämää informaatiota eri menetelmin.
+
+\input{ga/komponentit}
+\input{ga/algoritmi}

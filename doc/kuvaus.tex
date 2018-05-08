@@ -1,7 +1,9 @@
 \documentclass[12pt]{article}
-	\usepackage[margin=0.7in]{geometry}
+	\usepackage{geometry}
+	\usepackage[T1]{fontenc}
 	\usepackage[subpreambles=true]{standalone}
 	\usepackage[finnish]{babel}
+	\usepackage{filecontents}
 	\usepackage{
 		booktabs,
 		bookmark,
@@ -19,11 +21,11 @@
 	}
 	\usepackage[utf8]{inputenc}
 
+\graphicspath{{images/}}
+
 \restylefloat{table}
 
 \renewcommand*{\tableautorefname}{Taulukko}
-\counterwithin*{equation}{section}
-\renewcommand{\theequation}{\arabic{section}.\arabic{equation}}
 
 \hypersetup{colorlinks, citecolor=black, filecolor=black, linkcolor=black, urlcolor=black}
 
@@ -35,27 +37,19 @@
 
 \begin{document}
 
+
 \maketitle
 \tableofcontents
+\pagebreak
 
-\begin{abstract}
-Geneettinen algoritmi (GA) on luonnolliseen valinnan inspiroima optimointitekniikka.
-Sen aikana käytetään \textit{periytymisen}, \textit{mutaatioiden} ja \textit{rekombinaatioiden}
-prosesseja.
-\end{abstract}
-
+\input{johdanto}
 \input{ga}
-\input{algoritmi}
 \input{suunnittelu}
 \input{toteutus}
+\input{tulokset}
 
-\begin{thebibliography}{9}
-
-	\bibitem{wiki_ga}
-	\url{https://en.wikipedia.org/wiki/Genetic_algorithm}
-
-%http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.413.7546&rep=rep1&type=pdf
-
-\end{thebibliography}
+% \nocite{*}
+% \bibliographystyle{acm}
+% \bibliography{references}
 
 \end{document}

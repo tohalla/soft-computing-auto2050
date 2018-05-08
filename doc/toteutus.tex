@@ -1,1 +1,41 @@
 \section{Työn toteutus}
+
+Ohjelmointi aloitettiin luomalla valikot ohjelmassa navigoimista varten, tätä varten luotiin apufunktioita objektiin console.scala.
+Valikkoihin lisättiin pääsy mm. ongelman valintaan, muuttujien ja parametrien hallintaan sekä GAn toimintojen suorittamiseen.
+Valikkojen luominen sujui ongelmitta, ja onnistuminen kokeilemalla navigointia konsoliohjelmassa. Valikkojen toiminnallisuuksiin
+ei puututtu vielä tässä vaiheessa.
+
+Tämän jälkeen alettiin luomaan luvussa \ref{komponentit} esiteltyjä komponentteja. Alkioita varten, joka on geno- ja fenotyypin yläluokka,
+luotiin erillinen luokka muuttujia varten (\textit{Variable}), minkä jäseniin alkion alleelien arvot liitettiin. Muuttuja luokan oliot
+sisältävät vapaasti määriteltävät nimi ja yksikkö kentät, jotka selventävät ohjelman käyttäjälle muuttujan käyttöä. Luokassa on tieto myös
+kullekkin muuttuja luokan oliolle laskettavan arvon ylä- ja alarajasta, joita sovelluksen käyttäjä voi muuttaa ajon aikana.
+Sovellus tukee myös vakioita, jotka voidaan ottaa käyttöön määrittelemällä ylä- ja alaraja samaksi.
+
+Kun komponentit oltiin saatu luotua, tehtiin luokka geneettisen algoritmin hallintaa varten. Luokkaan lisättiin metodi
+valvojan parametrien (mutaation todennäköisyys, risteytyksen todennäköisyys, populaation koko ja elitismi) hallintaan
+sekä metodi valvojan käsittämän ongelman muuttujien hallintaan. Luokkaan tehtiin funktiot myös risteytystä ja uuden populaation
+generoimista varten. Uuden populaation generoimista varten tulee valita nykyisestä populaatiosta jäsenet, jotka siirtävät tähän informaatiota.
+Tätä varten luotiin oma piire (\textit{Trait, ParentSelection}), jonka jälkeen luotiin edelleen tästä periytyviä
+erilaisia valintametodeja käsittäviä objekteja.
+
+Työn aikana luotiin kolme eri valintatapaa. Jokaisessa näissä valintatavoissa valitaan riittävä määrä vanhempia seuraavan
+populaation generoimsta varten. \textit{RouletteSelection}:issa alkiot järjestetään kelvollisuusarvon mukaiseen
+järjestykseen, ja jonon kullakin jäsenellä on tämän kelvollisuusarvosta johdettu todennäköisyys
+(\(\frac{\text{alkion kelvollisuusarvo}}{\text{Populaation yhteenlasketut kelvollisuusarvot}}\))
+päätyä vanhemaksi. \textit{RankSelection:ion} ei suosi yhtä paljoa korkean kelvollisuusarvon omaavia yksilöitä,
+mikä vähentää GA:n jämähtämäistä lokaaleihin maksimeihin tai minimeihin. Edellä esitelty valintamenetelmä
+eroaa RouletteSelection:ista siten, että todennäköisyys alkion valinnalle määritellään sen paikasta järjestetystä
+populaatiosta (\(\frac{N-n}{\Sigma n}\)), jossa \(n\) alkion indeksi, indeksien yhteenlaskettu summa
+\(\Sigma n = N(N + 1)/2\) ja \(N\) populaation koko. Lisäksi luotiin \textit{RankedTournamentSelection}, joka toimii
+samoin tavoin edellä mainitun menetelmän kanssa, mutta vanhemmat valitaan satunnaisesta otoksesta koko populaation
+sijaan.
+
+Tämän jälkeen luotiin luvussa \ref{suunnittelu} esitetyille ongelmille valvoja luokan oliot.
+Kelvollisuusfunktioita määriteltäessä tulee ottaa huomioon, että mitä suurempi siitä palautettu arvo on,
+sitä suurempi todennäköisyys alkion on päätyä seuraavaan populaatioon. Maksimointi ongelmissa kelvollisuusarvon
+määrittäminen on suoraviivaista, sillä se voidaan suoraan määrittää ongelman "yhtälöksi".
+Jos on tarve suorittaa minimointi ongelma, niin esimerkiksi yhtälön \ref{eq:sum} kelvollisuusarvo voitaisiin laskea seuraavasti:
+\((-1)\times(a_1 - a_2 + a_3 - a_4 + a_5 - a_6 + a_7 - a_8)\). Jos taas halutaan etsiä kohtia, missä jokin yhtälö
+saavuttaa tietyn arvon, voidaan esimerkiksi yhtälön \ref{eq:xyz_graph} tapauksessa funktio määrittää
+\(a - \left| y \sin{ \left( \sqrt {x^2 + y^2} \right) } + x \left( sign(y) \right) \right|\), jossa \(a\) on tavoiteltava arvo.
+
