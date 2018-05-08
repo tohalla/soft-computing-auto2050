@@ -5,9 +5,7 @@ import scala.util.Random
 
 trait ParentSelection {
   // Palauttaa ehdokkaat, joista voidaan edelleen johtaa seuraavan sukupolven jäsenet
-  def getParents(candidates: Vector[Genotype], parentCount: Int): Vector[(Genotype, Genotype)]
-
-  def prepare(genotypes: Vector[Genotype]): Vector[Genotype] = genotypes
+  def getParents(genotypes: Vector[Genotype], parentCount: Int): Vector[(Genotype, Genotype)]
 
   protected def sort(genotypes: Vector[Genotype]): Vector[Genotype] =
     genotypes.sortWith(_.fitnessValue > _.fitnessValue)
@@ -23,15 +21,11 @@ trait ParentSelection {
 }
 
 object RouletteSelection extends ParentSelection {
-  // kelvollisuusarvo positiiviseksi
-  override def prepare(genotypes: Vector[Genotype]): Vector[Genotype] = {
-    genotypes.map(genotype => genotype.copy(
+  override def getParents(genotypes: Vector[Genotype], parentCount: Int): Vector[(Genotype, Genotype)] = {
+    // kelvollisuusarvo positiiviseksi
+    val candidates = genotypes.map(genotype => genotype.copy(
       fitnessValue = genotype.fitnessValue + Math.abs(genotypes.last.fitnessValue)
     ))
-  }
-
-  override def getParents(genotypes: Vector[Genotype], parentCount: Int): Vector[(Genotype, Genotype)] = {
-    val candidates = prepare(genotypes)
     val fitnessSum = candidates.foldLeft(0d)(_ + _.fitnessValue)
     val candidatesWithProbabilities = candidates.map(candidate => (candidate, candidate.fitnessValue / fitnessSum))
     Vector.fill(parentCount)((drawParent(candidatesWithProbabilities), drawParent(candidatesWithProbabilities)))
@@ -58,6 +52,5 @@ object RankedTournamentSelection extends ParentSelection {
       (drawParent(candidatesWithProbabilities), drawParent(candidatesWithProbabilities))
     })
   }
-
 }
 
